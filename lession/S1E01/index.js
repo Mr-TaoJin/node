@@ -1,27 +1,27 @@
-const https = require('https');
-const { URL } = require('url');
+var ding = require('./ding')
+var express = require('express')
+var app = express();
 
-const u = "https://oapi.dingtalk.com/robot/send?access_token=6a48709f045f3b3e78c2c55f70bb0acdb5b9f45b0d0bc9b6631d5c5695ebcf33";
+var  bodyParser = require('body-parser');
+app.use(bodyParser.json())
 
-let data = {
-    "msgtype": "text",
-    "text": {
-        "content": "这是一条测试消息"
-    },
-    "at": {
-        "atMobiles": [],
-        "isAtAll": false
+ding.resp('bafa6e52b05d02a62a86ee234c36a83f7c561b9553d38d05c63020ae0b588044');
+
+app.post('/ding', function (req, res) {
+    console.log(req.body);
+    const req_info = req.body;
+     // console.log(req_info.text.content);
+    let data ={
+        "msgtype": "text",
+        "text": {
+            "content": `我接收到了你的消息为:${req_info.text.content}`
+        },
+        "at": {
+            "atMobiles": [],
+            "atDingtalkIds":[req_info.senderId],
+            "isAtAll": false
+        }
     }
-}
-
-let req = https.request(new URL(u),{
-    'method': 'POST',
-    'headers': {
-        'content-type': 'application/json;charset=UTF-8'
-    }
-}, (res) => {
-    console.log("done")
+    ding.send(data);
 })
-
-req.write(JSON.stringify(data));
-req.end();
+app.listen(3000);
